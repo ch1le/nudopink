@@ -4,13 +4,46 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     html, body { margin: 0; padding: 0; }
+    body { font-family: 'Raleway', Arial, sans-serif; }
     img { display: block; border: 0; }
+    #hero { position: relative; }
+    #title { font-weight: 700; font-size: 18px; }
+    #question { font-style: italic; font-weight: 400; font-size: 14px; }
+    #body { font-weight: 400; font-size: 14px; }
+    .buttons { position: absolute; left: 0; right: 0; bottom: 0; transform: translateY(50%); display: flex; justify-content: space-between; align-items: center; }
+    .btn { display: flex; padding: 6px 14px; justify-content: center; align-items: center; gap: 8px; border-radius: 0 16px 16px 0; background: #FFCEBF; border: 0; font: inherit; font-weight: 400; font-size: 14px; color: #000; cursor: pointer; -webkit-appearance: none; appearance: none; }
+    .btn.next { border-radius: 16px 0 0 16px; }
+    /* Top-right tools */
+    #tools { position: absolute; top: 0; right: 0; padding-top: 8px; width: 50px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+    .tool { display: flex; padding: 12px; justify-content: center; align-items: center; gap: 8px; align-self: stretch; border-radius: 23px 0 0 23px; background: #FFCEBF; }
+    .tool-icon { display: block; width: 18px; height: 18px; padding: 0; }
+    .tool-round { display: flex; padding: 0; width: 42px; height: 42px; justify-content: center; align-items: center; gap: 0; border-radius: 23px; background: #FFCEBF; align-self: stretch; }
   </style>
 </head>
 <body>
-  <img src="5.webp" alt="Image" style="width:100%;height:auto;">
+  <div id="hero">
+    <img src="5.webp" alt="Image" style="width:100%;height:auto;border-radius:16px 16px 0 0;">
+    <div id="tools">
+      <div class="tool">
+        <img src="settings_icon.svg" alt="settings" class="tool-icon">
+      </div>
+      <div class="tool-round">
+        <img src="map_icon.svg" alt="map" class="tool-icon">
+      </div>
+      <div class="tool-round">
+        <img src="heart_icon.svg" alt="favorite" class="tool-icon">
+      </div>
+    </div>
+    <div id="buttons" class="buttons">
+      <button class="btn"><span aria-hidden="true">‹</span><span>prev</span></button>
+      <button class="btn next"><span>next</span><span aria-hidden="true">›</span></button>
+    </div>
+  </div>
 
   <div id="content" style="padding:8px 24px 0 24px;display:flex;flex-direction:column;gap:8px;">
     <div id="title"></div>
