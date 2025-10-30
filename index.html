@@ -112,8 +112,9 @@
       if (!img) return;
       const rect = img.getBoundingClientRect();
       const viewportH = window.innerHeight || document.documentElement.clientHeight;
-      // Distance needed to move the fixed bottom bar up to the image bottom
-      const delta = rect.bottom - (viewportH - 96);
+      const btnRect = buttons.getBoundingClientRect();
+      // Move so the BUTTONS' CENTER aligns with the image bottom line
+      const delta = rect.bottom - (viewportH - 96) + (btnRect.height / 2);
       buttons.style.setProperty('--btn-initial-offset', delta + 'px');
       buttons.classList.add('ready');
     };
