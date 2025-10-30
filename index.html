@@ -15,7 +15,9 @@
     #title { font-weight: 700; font-size: 18px; }
     #question { font-style: italic; font-weight: 400; font-size: 14px; }
     #body { font-weight: 400; font-size: 14px; }
-    .buttons { position: absolute; left: 0; right: 0; bottom: 0; transform: translateY(50%); display: flex; justify-content: space-between; align-items: center; }
+    .buttons { position: absolute; left: 0; right: 0; bottom: 0; transform: translateY(50%); display: flex; justify-content: space-between; align-items: center; z-index: 9; transition: transform 250ms ease, bottom 250ms ease; }
+    /* After reveal, move to bottom of viewport with 48px offset, starting 330ms after tools finish */
+    .buttons.revealed { position: fixed; left: 0; right: 0; bottom: 96px; transform: translateY(0); transition-delay: 330ms; }
     .btn { display: flex; padding: 6px 14px; justify-content: center; align-items: center; gap: 8px; border-radius: 0 16px 16px 0; background: #FFCEBF; border: 0; font: inherit; font-weight: 400; font-size: 14px; color: #000; cursor: pointer; -webkit-appearance: none; appearance: none; }
     .btn.next { border-radius: 16px 0 0 16px; }
     /* Top-right tools */
@@ -99,12 +101,15 @@
   // Reveal secondary tool buttons on first scroll
   (function() {
     const tools = document.getElementById('tools');
+    const buttons = document.getElementById('buttons');
     if (!tools) return;
     const onScroll = function() {
       if (window.scrollY > 0) {
         tools.classList.add('revealed');
+        if (buttons) buttons.classList.add('revealed');
       } else {
         tools.classList.remove('revealed');
+        if (buttons) buttons.classList.remove('revealed');
       }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
