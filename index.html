@@ -19,10 +19,13 @@
     .btn { display: flex; padding: 6px 14px; justify-content: center; align-items: center; gap: 8px; border-radius: 0 16px 16px 0; background: #FFCEBF; border: 0; font: inherit; font-weight: 400; font-size: 14px; color: #000; cursor: pointer; -webkit-appearance: none; appearance: none; }
     .btn.next { border-radius: 16px 0 0 16px; }
     /* Top-right tools */
-    #tools { position: absolute; top: 0; right: 0; padding-top: 8px; width: 50px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+    #tools { position: fixed; top: 8px; right: 0; width: 50px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; z-index: 10; }
     .tool { display: flex; padding: 12px; justify-content: center; align-items: center; gap: 8px; align-self: stretch; border-radius: 23px 0 0 23px; background: #FFCEBF; }
     .tool-icon { display: block; width: 18px; height: 18px; padding: 0; }
-    .tool-round { display: flex; padding: 0; width: 42px; height: 42px; justify-content: center; align-items: center; gap: 0; border-radius: 23px; background: #FFCEBF; align-self: stretch; }
+    .tool-round { display: flex; padding: 0; width: 42px; height: 42px; justify-content: center; align-items: center; gap: 0; border-radius: 23px; background: #FFCEBF; align-self: stretch; opacity: 0; transform: translateY(-12px); transition: opacity 200ms ease, transform 200ms ease; }
+    #tools.revealed .tool-round { opacity: 1; transform: translateY(0); }
+    #tools.revealed .tool-round:nth-child(2) { transition-delay: 50ms; }
+    #tools.revealed .tool-round:nth-child(3) { transition-delay: 100ms; }
   </style>
 </head>
 <body>
@@ -92,6 +95,21 @@
       const bodyEl = document.getElementById('body');
       bodyEl.textContent = 'Failed to load content: ' + (err && err.message ? err.message : 'unknown error');
     }
+  })();
+  // Reveal secondary tool buttons on first scroll
+  (function() {
+    const tools = document.getElementById('tools');
+    if (!tools) return;
+    const onScroll = function() {
+      if (window.scrollY > 0) {
+        tools.classList.add('revealed');
+      } else {
+        tools.classList.remove('revealed');
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // Initialize state on load
+    onScroll();
   })();
   </script>
 </body>
