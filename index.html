@@ -131,15 +131,20 @@
         computeInitialOffset();
       }
     }
+    let toolsRevealedOnce = false;
     const onScroll = function() {
       if (window.scrollY > 0) {
         tools.classList.add('revealed');
+        toolsRevealedOnce = true;
         if (buttons) {
           buttons.classList.add('revealed');
           buttons.classList.remove('initial');
         }
       } else {
-        tools.classList.remove('revealed');
+        // Keep tools revealed once they have appeared at least once
+        if (!toolsRevealedOnce) {
+          tools.classList.remove('revealed');
+        }
         if (buttons) {
           buttons.classList.remove('revealed');
           buttons.classList.add('initial');
