@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page</title>
+</head>
+<body>
+  <img src="5.webp" alt="Image" style="width:100%;height:auto;">
+
+  <div id="title"></div>
+  <div id="question"></div>
+  <div id="body"></div>
+
+  <script>
+  (async function() {
+    try {
+      const res = await fetch('content_text.txt');
+      const text = await res.text();
+
+      const titleMatch = text.match(/^title:\s*"([^"]*)"/m);
+      const questionMatch = text.match(/^question:\s*"([^"]*)"/m);
+
+      const bodyStart = text.indexOf('body:');
+      let bodyContent = '';
+      if (bodyStart !== -1) {
+        const afterLabel = text.indexOf('"', bodyStart);
+        const lastQuote = text.lastIndexOf('"');
+        if (afterLabel !== -1 && lastQuote !== -1 && lastQuote > afterLabel) {
+          bodyContent = text.slice(afterLabel + 1, lastQuote);
+        }
+      }
+
+      const titleEl = document.getElementById('title');
+      const questionEl = document.getElementById('question');
+      const bodyEl = document.getElementById('body');
+
+      titleEl.textContent = titleMatch ? titleMatch[1] : '';
+      questionEl.textContent = questionMatch ? questionMatch[1] : '';
+      bodyEl.innerHTML = bodyContent;
+    } catch (_) {
+      // noop
+    }
+  })();
+  </script>
+</body>
+</html>
+
+
