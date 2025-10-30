@@ -16,8 +16,8 @@
     #question { font-style: italic; font-weight: 400; font-size: 14px; }
     #body { font-weight: 400; font-size: 14px; }
     .buttons { position: fixed; left: 0; right: 0; bottom: 96px; display: flex; justify-content: space-between; align-items: center; z-index: 9; transition: transform 250ms ease; }
-    /* Start around mid-screen, then slide to bottom offset */
-    .buttons.initial { transform: translateY(-50vh); }
+    /* Start exactly at the image/description boundary using computed offset */
+    .buttons.initial { transform: translateY(var(--btn-initial-offset, 0)); }
     .buttons.revealed { transform: translateY(0); transition-delay: 330ms; }
     .btn { display: flex; padding: 6px 14px; justify-content: center; align-items: center; gap: 8px; border-radius: 0 16px 16px 0; background: #FFCEBF; border: 0; font: inherit; font-weight: 400; font-size: 14px; color: #000; cursor: pointer; -webkit-appearance: none; appearance: none; }
     .btn.next { border-radius: 16px 0 0 16px; }
@@ -104,7 +104,21 @@
     const tools = document.getElementById('tools');
     const buttons = document.getElementById('buttons');
     if (!tools) return;
-    if (buttons) buttons.classList.add('initial');
+    const computeInitialOffset = function() {
+      if (!buttons) return;
+      if (window.scrollY > 0) return; // only compute for initial state
+      const img = document.querySelector('#hero img');
+      if (!img) return;
+      const rect = img.getBoundingClientRect();
+      const viewportH = window.innerHeight || document.documentElement.clientHeight;
+      // Distance needed to move the fixed bottom bar up to the image bottom
+      const delta = rect.bottom - (viewportH - 96);
+      buttons.style.setProperty('--btn-initial-offset', delta + 'px');
+    };
+    if (buttons) {
+      buttons.classList.add('initial');
+      computeInitialOffset();
+    }
     const onScroll = function() {
       if (window.scrollY > 0) {
         tools.classList.add('revealed');
@@ -117,10 +131,12 @@
         if (buttons) {
           buttons.classList.remove('revealed');
           buttons.classList.add('initial');
+          computeInitialOffset();
         }
       }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', computeInitialOffset);
     // Initialize state on load
     onScroll();
   })();
