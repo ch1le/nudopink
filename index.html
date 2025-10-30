@@ -4,6 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Page</title>
+  <style>
+    html, body { margin: 0; padding: 0; }
+    img { display: block; border: 0; }
+  </style>
 </head>
 <body>
   <img src="5.webp" alt="Image" style="width:100%;height:auto;">
@@ -15,13 +19,15 @@
   <script>
   (async function() {
     try {
-      const res = await fetch('content_text.txt');
+      const url = 'content_text.txt?v=' + Date.now();
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + res.statusText);
       let text = await res.text();
       // Remove potential BOM
       text = text.replace(/^\uFEFF/, '');
 
-      const titleMatch = text.match(/^\s*title:\s*"([^"]*)"/m);
-      const questionMatch = text.match(/^\s*question:\s*"([^"]*)"/m);
+      const titleMatch = text.match(/^\s*title:\s*"([^"]*)"/mi);
+      const questionMatch = text.match(/^\s*question:\s*"([^"]*)"/mi);
 
       const bodyStart = text.indexOf('body:');
       let bodyContent = '';
@@ -45,8 +51,11 @@
       if (!titleEl.textContent && !questionEl.textContent && !bodyEl.innerHTML) {
         bodyEl.textContent = text;
       }
-    } catch (_) {
-      // In case of fetch error, do nothing (page stays with image only)
+
+      
+    } catch (err) {
+      const bodyEl = document.getElementById('body');
+      bodyEl.textContent = 'Failed to load content: ' + (err && err.message ? err.message : 'unknown error');
     }
   })();
   </script>
