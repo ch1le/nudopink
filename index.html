@@ -16,10 +16,12 @@
   (async function() {
     try {
       const res = await fetch('content_text.txt');
-      const text = await res.text();
+      let text = await res.text();
+      // Remove potential BOM
+      text = text.replace(/^\uFEFF/, '');
 
-      const titleMatch = text.match(/^title:\s*"([^"]*)"/m);
-      const questionMatch = text.match(/^question:\s*"([^"]*)"/m);
+      const titleMatch = text.match(/^\s*title:\s*"([^"]*)"/m);
+      const questionMatch = text.match(/^\s*question:\s*"([^"]*)"/m);
 
       const bodyStart = text.indexOf('body:');
       let bodyContent = '';
@@ -37,9 +39,14 @@
 
       titleEl.textContent = titleMatch ? titleMatch[1] : '';
       questionEl.textContent = questionMatch ? questionMatch[1] : '';
-      bodyEl.innerHTML = bodyContent;
+      bodyEl.innerHTML = bodyContent || '';
+
+      // Fallback: if nothing parsed, show raw content to aid debugging
+      if (!titleEl.textContent && !questionEl.textContent && !bodyEl.innerHTML) {
+        bodyEl.textContent = text;
+      }
     } catch (_) {
-      // noop
+      // In case of fetch error, do nothing (page stays with image only)
     }
   })();
   </script>
