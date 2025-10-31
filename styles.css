@@ -1,0 +1,23 @@
+:root {
+  --title-size: 24px;
+  --question-size: 18px;
+  --body-size: 18px;
+}
+
+#content {
+  background: #ffffff;
+}
+
+#title {
+  font-size: var(--title-size);
+}
+
+#question {
+  font-size: var(--question-size);
+}
+
+#body {
+  font-size: var(--body-size);
+}
+
+
