@@ -15,9 +15,9 @@
     /* Background image behind all content */
     #bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%); height: 100vh; width: auto; z-index: -1; pointer-events: none; }
     #hero { position: relative; }
-    #title { font-weight: 700; font-size: 18px; }
-    #question { font-style: italic; font-weight: 400; font-size: 14px; }
-    #body { font-weight: 400; font-size: 14px; }
+    #title { font-weight: 700; }
+    #question { font-style: italic; font-weight: 400; }
+    #body { font-weight: 400; }
     .buttons { position: fixed; left: 0; right: 0; bottom: 96px; display: flex; justify-content: space-between; align-items: center; z-index: 9; transition: transform 250ms ease; visibility: hidden; }
     .buttons.ready { visibility: visible; }
     /* Start exactly at the image/description boundary using computed offset */
@@ -58,7 +58,7 @@
     </div>
   </div>
 
-  <div id="content" style="padding:8px 16px 0 16px;display:flex;flex-direction:column;gap:8px;">
+  <div id="content" style="margin:0 16px;padding:8px 16px 0 16px;display:flex;flex-direction:column;gap:8px;">
     <div id="title"></div>
     <div id="question"></div>
     <div id="body"></div>
