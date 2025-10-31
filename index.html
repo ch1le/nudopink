@@ -11,6 +11,8 @@
     html, body { margin: 0; padding: 0; }
     body { font-family: 'Raleway', Arial, sans-serif; }
     img { display: block; border: 0; }
+    /* Background image behind all content */
+    #bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%); height: 100vh; width: auto; z-index: 0; pointer-events: none; }
     #hero { position: relative; }
     #title { font-weight: 700; font-size: 18px; }
     #question { font-style: italic; font-weight: 400; font-size: 14px; }
@@ -33,7 +35,10 @@
   </style>
 </head>
 <body>
-  <div id="hero">
+  <!-- Background image -->
+  <img id="bg" src="Kuvatõmmis 2025-10-31 102242.png" alt="" aria-hidden="true">
+
+  <div id="hero" style="padding:16px 16px 0 16px;">
     <img src="5.webp" alt="Image" style="width:100%;height:auto;border-radius:16px 16px 0 0;">
     <div id="tools">
       <div class="tool">
