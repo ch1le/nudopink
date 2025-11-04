@@ -117,9 +117,13 @@
       overflow-y: auto; 
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
+      pointer-events: none;
+      visibility: hidden;
     }
     #preferences-card.open { 
       transform: translateY(0); 
+      pointer-events: auto;
+      visibility: visible;
     }
     /* Prevent body scroll when preferences card is open */
     html.preferences-open,
@@ -741,7 +745,9 @@
     
     if (!preferencesCard || !preferencesButton) return;
     
-    preferencesButton.addEventListener('click', function() {
+    preferencesButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
       const isOpen = preferencesCard.classList.toggle('open');
       if (isOpen) {
         document.documentElement.classList.add('preferences-open');
