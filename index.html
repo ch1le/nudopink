@@ -15,6 +15,38 @@
     /* Background image behind all content */
     #bg { position: fixed; top: 0; left: 50%; transform: translateX(-50%); height: 100vh; width: auto; z-index: -1; pointer-events: none; }
     #hero { position: relative; }
+    #hero.map-view > img:first-child { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 300ms ease, visibility 300ms ease; }
+    #content { position: relative; transition: opacity 300ms ease, visibility 300ms ease; }
+    #content.map-view { opacity: 0; visibility: hidden; }
+    /* Map view - disable scrolling */
+    body.map-view { overflow: hidden; height: 100vh; }
+    body.map-view #hero { position: fixed; top: 0; left: 0; right: 0; bottom: 0; height: 100vh; width: 100%; }
+    /* Map view sharing section */
+    #map-sharing-section {
+      position: fixed;
+      bottom: 16px;
+      left: 0;
+      right: 0;
+      width: 100%;
+      padding: 8px 24px;
+      padding-left: calc(16px + 24px);
+      padding-right: calc(16px + 24px);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      z-index: 8;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 300ms ease, visibility 300ms ease;
+      box-sizing: border-box;
+    }
+    #map-sharing-section.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
     #title { font-weight: 700; }
     #question { font-style: italic; font-weight: 400; }
     #body { font-weight: 400; }
@@ -23,6 +55,7 @@
     /* Start exactly at the image/description boundary using computed offset */
     .buttons.initial { transform: translateY(var(--btn-initial-offset, 0)); }
     .buttons.revealed { transform: translateY(0); }
+    .buttons.default { transform: translateY(0); }
     .btn { display: flex; padding: 8px 18px; justify-content: center; align-items: center; gap: 8px; border-radius: 0 16px 16px 0; background: #FFCEBF; border: 0; font: inherit; font-weight: 400; font-size: 14px; color: #000; cursor: pointer; -webkit-appearance: none; appearance: none; }
     .btn.next { border-radius: 16px 0 0 16px; }
     /* Top-right tools */
@@ -372,7 +405,7 @@
       </div>
       <div class="tool-round">
         <img src="heart_icon.svg" alt="favorite" class="tool-icon">
-        <span class="tool-label">favourites</span>
+        <span class="tool-label">favourite</span>
       </div>
     </div>
     <div id="buttons" class="buttons">
@@ -385,6 +418,16 @@
     <div id="title"></div>
     <div id="question"></div>
     <div id="body"></div>
+  </div>
+
+  <!-- Map view sharing section -->
+  <div id="map-sharing-section">
+    <div class="share-start-title">To get started on exploring together:</div>
+    <div class="share-instruction">Copy and share the unique link below:</div>
+    <div class="share-link-container">
+      <input type="text" value="www.nuudo.eu/uniqueid" class="share-link-input" readonly>
+      <button class="share-copy-button">copy</button>
+    </div>
   </div>
 
   <!-- Preferences card -->
@@ -560,6 +603,12 @@
     let hasScrolled = false;
     
     const onScroll = function() {
+      // Don't change states if map view is active
+      const hero = document.getElementById('hero');
+      if (hero && hero.classList.contains('map-view')) {
+        return;
+      }
+      
       const scrollY = window.scrollY;
       
       if (scrollY === 0) {
@@ -650,24 +699,32 @@
       });
     }
     
-    // Copy button functionality
-    const copyButton = document.querySelector('.share-copy-button');
-    const shareLinkInput = document.querySelector('.share-link-input');
-    if (copyButton && shareLinkInput) {
-      copyButton.addEventListener('click', function() {
-        shareLinkInput.select();
-        shareLinkInput.setSelectionRange(0, 99999); // For mobile devices
-        try {
-          document.execCommand('copy');
-          // Visual feedback could be added here
-        } catch (err) {
-          // Fallback for modern browsers
-          navigator.clipboard.writeText(shareLinkInput.value).catch(function(err) {
-            console.error('Failed to copy:', err);
+    // Copy button functionality - for both preferences card and map view
+    const setupCopyButtons = function() {
+      const copyButtons = document.querySelectorAll('.share-copy-button');
+      const shareLinkInputs = document.querySelectorAll('.share-link-input');
+      
+      copyButtons.forEach(function(copyButton, index) {
+        const shareLinkInput = shareLinkInputs[index];
+        if (copyButton && shareLinkInput) {
+          copyButton.addEventListener('click', function() {
+            shareLinkInput.select();
+            shareLinkInput.setSelectionRange(0, 99999); // For mobile devices
+            try {
+              document.execCommand('copy');
+              // Visual feedback could be added here
+            } catch (err) {
+              // Fallback for modern browsers
+              navigator.clipboard.writeText(shareLinkInput.value).catch(function(err) {
+                console.error('Failed to copy:', err);
+              });
+            }
           });
         }
       });
-    }
+    };
+    
+    setupCopyButtons();
     
     // Location buttons functionality
     const locationNoButton = document.querySelector('.location-no-button');
@@ -699,6 +756,106 @@
       
       // Initialize filter on load
       updateIconFilters();
+    }
+    
+    // Location button handler - needs access to onScroll
+    const locationButton = document.querySelectorAll('.tool-round')[0];
+    const heroForLocation = document.getElementById('hero');
+    const contentForLocation = document.getElementById('content');
+    const toolsForLocation = document.getElementById('tools');
+    const buttonsForLocation = document.getElementById('buttons');
+    
+    if (locationButton && heroForLocation && contentForLocation) {
+      locationButton.addEventListener('click', function() {
+        // Toggle map view by hiding hero and content
+        const isMapView = heroForLocation.classList.toggle('map-view');
+        
+        if (isMapView) {
+          // Show map view (background image) by hiding hero and content
+          heroForLocation.classList.add('map-view');
+          contentForLocation.classList.add('map-view');
+          document.body.classList.add('map-view');
+          
+          // Show map sharing section
+          const mapSharingSection = document.getElementById('map-sharing-section');
+          if (mapSharingSection) {
+            mapSharingSection.classList.add('active');
+          }
+          
+          // Move buttons to default position - preserve initial offset if it exists
+          if (buttonsForLocation) {
+            buttonsForLocation.classList.remove('revealed');
+            // Use initial class to preserve the computed offset, or default if no offset
+            const initialOffset = buttonsForLocation.style.getPropertyValue('--btn-initial-offset');
+            if (initialOffset) {
+              buttonsForLocation.classList.add('initial');
+            } else {
+              buttonsForLocation.classList.add('default');
+            }
+          }
+          
+          // Set tools to state 2 (with-labels) and keep them there
+          if (toolsForLocation) {
+            toolsForLocation.classList.remove('revealed', 'all-revealed');
+            toolsForLocation.classList.add('with-labels');
+            // Show all tool buttons with labels
+            const allToolButtons = toolsForLocation.querySelectorAll('.tool, .tool-round');
+            allToolButtons.forEach(btn => {
+              btn.classList.remove('revealed');
+            });
+          }
+          
+          // Change location button (button 2) icon and text in map view
+          const locationButtonIcon = locationButton.querySelector('.tool-icon');
+          const locationButtonLabel = locationButton.querySelector('.tool-label');
+          if (locationButtonIcon && locationButtonLabel) {
+            locationButtonIcon.src = 'book-open.svg';
+            locationButtonIcon.alt = 'return to stories';
+            locationButtonLabel.textContent = 'return to stories';
+          }
+          
+          // Change preferences button (button 1) text in map view
+          const preferencesButton = document.querySelector('.tool');
+          const preferencesButtonLabel = preferencesButton ? preferencesButton.querySelector('.tool-label') : null;
+          if (preferencesButtonLabel) {
+            preferencesButtonLabel.textContent = 'refine search';
+          }
+        } else {
+          // Hide map view - restore hero and content
+          heroForLocation.classList.remove('map-view');
+          contentForLocation.classList.remove('map-view');
+          document.body.classList.remove('map-view');
+          
+          // Hide map sharing section
+          const mapSharingSection = document.getElementById('map-sharing-section');
+          if (mapSharingSection) {
+            mapSharingSection.classList.remove('active');
+          }
+          
+          // Restore location button (button 2) icon and text
+          const locationButtonIcon = locationButton.querySelector('.tool-icon');
+          const locationButtonLabel = locationButton.querySelector('.tool-label');
+          if (locationButtonIcon && locationButtonLabel) {
+            locationButtonIcon.src = 'map_icon.svg';
+            locationButtonIcon.alt = 'location';
+            locationButtonLabel.textContent = 'location';
+          }
+          
+          // Restore preferences button (button 1) text
+          const preferencesButton = document.querySelector('.tool');
+          const preferencesButtonLabel = preferencesButton ? preferencesButton.querySelector('.tool-label') : null;
+          if (preferencesButtonLabel) {
+            preferencesButtonLabel.textContent = 'preferences';
+          }
+          
+          // Restore buttons and tools to current scroll position by triggering scroll
+          if (buttonsForLocation) {
+            buttonsForLocation.classList.remove('default');
+          }
+          // Trigger scroll event to restore state
+          window.dispatchEvent(new Event('scroll'));
+        }
+      });
     }
   })();
   </script>
