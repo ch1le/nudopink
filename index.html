@@ -72,7 +72,9 @@
       width: 100%; 
       max-width: 100%; 
       height: 100vh; 
+      height: 100dvh; /* Dynamic viewport height for mobile */
       padding: 8px 24px; 
+      padding-top: max(8px, env(safe-area-inset-top, 8px)); 
       background: #fff; 
       display: flex; 
       flex-direction: column; 
@@ -83,6 +85,17 @@
       transition: transform 300ms ease; 
       box-sizing: border-box; 
       overflow-y: auto; 
+    }
+    @supports (height: 100dvh) {
+      #preferences-card {
+        height: 100dvh;
+      }
+    }
+    /* Add extra top padding on mobile to account for browser UI */
+    @media (max-width: 768px) {
+      #preferences-card {
+        padding-top: calc(8px + env(safe-area-inset-top, 0px) + 60px);
+      }
     }
     #preferences-card.open { 
       transform: translateY(0); 
