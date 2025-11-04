@@ -569,21 +569,18 @@
           tools.classList.add('revealed', 'all-revealed');
           const allButtons = tools.querySelectorAll('.tool, .tool-round');
           allButtons.forEach(btn => btn.classList.add('revealed'));
-          if (buttons) {
-            buttons.classList.add('revealed');
-            buttons.classList.remove('initial');
-          }
         } else {
           // State 1: Initial - no scroll yet, show initial state
           tools.classList.remove('with-labels', 'revealed', 'all-revealed');
           // Remove revealed class from all buttons
           const allButtons = tools.querySelectorAll('.tool, .tool-round');
           allButtons.forEach(btn => btn.classList.remove('revealed'));
-          if (buttons) {
-            buttons.classList.remove('revealed');
-            buttons.classList.add('initial');
-            computeInitialOffset();
-          }
+        }
+        // Always return buttons to initial position when at top
+        if (buttons) {
+          buttons.classList.remove('revealed');
+          buttons.classList.add('initial');
+          computeInitialOffset();
         }
       } else if (scrollY > 0) {
         hasScrolled = true;
