@@ -422,8 +422,8 @@
 
   <!-- Map view sharing section -->
   <div id="map-sharing-section">
-    <div class="share-start-title">To get started on exploring together:</div>
-    <div class="share-instruction">Copy and share the unique link below:</div>
+    <div class="share-start-title">Share your map with others:</div>
+    <div class="share-instruction">Copy and share the unique link</div>
     <div class="share-link-container">
       <input type="text" value="www.nuudo.eu/uniqueid" class="share-link-input" readonly>
       <button class="share-copy-button">copy</button>
@@ -782,16 +782,10 @@
             mapSharingSection.classList.add('active');
           }
           
-          // Move buttons to default position - preserve initial offset if it exists
+          // Move buttons to state 2 (revealed) position
           if (buttonsForLocation) {
-            buttonsForLocation.classList.remove('revealed');
-            // Use initial class to preserve the computed offset, or default if no offset
-            const initialOffset = buttonsForLocation.style.getPropertyValue('--btn-initial-offset');
-            if (initialOffset) {
-              buttonsForLocation.classList.add('initial');
-            } else {
-              buttonsForLocation.classList.add('default');
-            }
+            buttonsForLocation.classList.remove('initial', 'default');
+            buttonsForLocation.classList.add('revealed');
           }
           
           // Set tools to state 2 (with-labels) and keep them there
