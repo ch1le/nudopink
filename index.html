@@ -47,6 +47,9 @@
       visibility: visible;
       pointer-events: auto;
     }
+    #map-sharing-section .share-instruction {
+      margin-top: -8px;
+    }
     #title { font-weight: 700; }
     #question { font-style: italic; font-weight: 400; }
     #body { font-weight: 400; }
@@ -54,7 +57,7 @@
     .buttons.ready { visibility: visible; }
     /* Start exactly at the image/description boundary using computed offset */
     .buttons.initial { transform: translateY(var(--btn-initial-offset, 0)); }
-    .buttons.revealed { transform: translateY(0); }
+    .buttons.revealed { bottom: 15vh; transform: translateY(0); }
     .buttons.default { transform: translateY(0); }
     .btn { display: flex; padding: 8px 18px; justify-content: center; align-items: center; gap: 8px; border-radius: 0 16px 16px 0; background: #FFCEBF; border: 0; font: inherit; font-weight: 400; font-size: 14px; color: #000; cursor: pointer; -webkit-appearance: none; appearance: none; }
     .btn.next { border-radius: 16px 0 0 16px; }
