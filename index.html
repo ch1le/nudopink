@@ -66,15 +66,13 @@
     /* Preferences card */
     #preferences-card { 
       position: fixed; 
+      top: 0;
       bottom: 0; 
       left: 0; 
       right: 0; 
       width: 100%; 
       max-width: 100%; 
-      height: 100vh; 
-      height: 100dvh; /* Dynamic viewport height for mobile */
       padding: 8px 24px; 
-      padding-top: max(8px, env(safe-area-inset-top, 8px)); 
       background: #fff; 
       display: flex; 
       flex-direction: column; 
@@ -86,19 +84,12 @@
       box-sizing: border-box; 
       overflow-y: auto; 
     }
-    @supports (height: 100dvh) {
-      #preferences-card {
-        height: 100dvh;
-      }
-    }
-    /* Add extra top padding on mobile to account for browser UI */
-    @media (max-width: 768px) {
-      #preferences-card {
-        padding-top: calc(8px + env(safe-area-inset-top, 0px) + 60px);
-      }
-    }
     #preferences-card.open { 
       transform: translateY(0); 
+    }
+    /* Prevent body scroll when preferences card is open */
+    body.preferences-open {
+      overflow: hidden;
     }
     #preferences-card > div {
       width: 100%;
@@ -145,6 +136,7 @@
       width: 38vw;
       height: auto;
       object-fit: contain;
+      align-self: center;
     }
     .narrowsearch-title {
       color: #333;
@@ -165,6 +157,12 @@
     .location-buttons {
       display: flex;
       gap: 8px;
+      align-items: center;
+    }
+    .location-yes-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .location-no-button,
     .location-yes-button {
@@ -181,6 +179,10 @@
       appearance: none;
     }
     .location-no-button {
+      background: transparent;
+      color: #333;
+    }
+    .location-no-button.active {
       background: #2C2C2C;
       color: #fff;
     }
@@ -188,10 +190,24 @@
       background: transparent;
       color: #333;
     }
+    .location-yes-button.active {
+      background: #2C2C2C;
+      color: #fff;
+    }
     .location-icon {
       width: 18px;
       height: 18px;
       display: block;
+    }
+    /* Icon color changes when button is active */
+    .location-no-button.active .location-icon,
+    .location-yes-button.active .location-icon {
+      filter: brightness(0) invert(1);
+    }
+    /* Reset icon color when not active */
+    .location-no-button:not(.active) .location-icon,
+    .location-yes-button:not(.active) .location-icon {
+      filter: none;
     }
     .location-note {
       color: #333;
@@ -254,6 +270,7 @@
       width: 38vw;
       height: auto;
       object-fit: contain;
+      align-self: center;
     }
     .share-title,
     .share-start-title {
@@ -386,15 +403,17 @@
       <div class="narrowsearch-title">Narrow your search:</div>
       <div class="narrowsearch-question">Prioritize objects that are closest to you?</div>
       <div class="location-buttons">
-        <button class="location-no-button">
+        <button class="location-no-button active">
           <img src="location-pin-no.svg" alt="no location" class="location-icon">
           <span>No</span>
         </button>
-        <button class="location-yes-button">
-          <img src="location-pin-yes.svg" alt="yes location" class="location-icon">
-          <span>Yes</span>
+        <div class="location-yes-container">
+          <button class="location-yes-button">
+            <img src="location-pin-yes.svg" alt="yes location" class="location-icon">
+            <span>Yes</span>
+          </button>
           <span class="location-note">(requires Location Sharing)</span>
-        </button>
+        </div>
       </div>
     </div>
     <div id="interests-section">
@@ -619,12 +638,18 @@
     if (!preferencesCard || !preferencesButton) return;
     
     preferencesButton.addEventListener('click', function() {
-      preferencesCard.classList.toggle('open');
+      const isOpen = preferencesCard.classList.toggle('open');
+      if (isOpen) {
+        document.body.classList.add('preferences-open');
+      } else {
+        document.body.classList.remove('preferences-open');
+      }
     });
     
     if (backButton) {
       backButton.addEventListener('click', function() {
         preferencesCard.classList.remove('open');
+        document.body.classList.remove('preferences-open');
       });
     }
     
@@ -645,6 +670,38 @@
           });
         }
       });
+    }
+    
+    // Location buttons functionality
+    const locationNoButton = document.querySelector('.location-no-button');
+    const locationYesButton = document.querySelector('.location-yes-button');
+    const locationNoIcon = document.querySelector('.location-no-button .location-icon');
+    const locationYesIcon = document.querySelector('.location-yes-button .location-icon');
+    
+    if (locationNoButton && locationYesButton) {
+      const updateIconFilters = function() {
+        if (locationNoIcon) {
+          locationNoIcon.style.filter = locationNoButton.classList.contains('active') ? 'brightness(0) invert(1)' : 'none';
+        }
+        if (locationYesIcon) {
+          locationYesIcon.style.filter = locationYesButton.classList.contains('active') ? 'brightness(0) invert(1)' : 'none';
+        }
+      };
+      
+      locationNoButton.addEventListener('click', function() {
+        locationNoButton.classList.add('active');
+        locationYesButton.classList.remove('active');
+        updateIconFilters();
+      });
+      
+      locationYesButton.addEventListener('click', function() {
+        locationYesButton.classList.add('active');
+        locationNoButton.classList.remove('active');
+        updateIconFilters();
+      });
+      
+      // Initialize filter on load
+      updateIconFilters();
     }
   })();
   </script>
